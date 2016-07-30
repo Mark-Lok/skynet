@@ -1,44 +1,46 @@
+# import the necessary packages
+# from picamera.array import PiRGBArray
+from picamera import PiCamera
+import time
+import cv2
+
+# initialize the camera and grab a reference to the raw camera capture
 import RPi.GPIO as gp
 import os
 
-gp.setwarnings(False)
-gp.setmode(gp.BOARD)
+def CameraTest():
+    gp.setwarnings(False)
+    gp.setmode(gp.BOARD)
 
-gp.setup(7, gp.OUT)
-gp.setup(11, gp.OUT)
-gp.setup(12, gp.OUT)
+    gp.setup(7, gp.OUT)   # Selection Pin
+    gp.setup(11, gp.OUT)  # Enable 1
+    gp.setup(12, gp.OUT)  # Enable 2
 
-gp.setup(15, gp.OUT)
-gp.setup(16, gp.OUT)
-gp.setup(21, gp.OUT)
-gp.setup(22, gp.OUT)
+    gp.output(11, True)   # Set to disable cameras
+    gp.output(12, True)   # Set to disable cameras
 
-gp.output(11, True)
-gp.output(12, True)
-gp.output(15, True)
-gp.output(16, True)
-gp.output(21, True)
-gp.output(22, True)
 
-def main():
-    gp.output(7, False)
+    # Camera A and C are using 
+    # Selection Pin | Enable 1 | Enable 2 |
+    # For Selecting Cam A 
+    #   0           |   0      |    1     |
+    # For Selecting Cam C
+    #   0           |   1      |    0     |
+
+
+    # Selecting Cam A
+    gp.output(7,  False)
     gp.output(11, False)
     gp.output(12, True)
-    capture(1)
+    camera = PiCamera()
+    camera.start_preview()
+    time.sleep(20)
 
-    gp.output(7, False)
+
+    # Selecting Cam C
+    gp.output(7,  False)
     gp.output(11, True)
     gp.output(12, False)
-    capture(3)
-
-
-def capture(cam):
-    cmd = "raspistill -o capture_%d.jpg" % cam
-    os.system(cmd)
-
-if __name__ == "__main__":
-    main()
-
-    gp.output(7, False)
-    gp.output(11, False)
-    gp.output(12, True)
+    time.sleep(20)
+    camera.stop_preview()
+    return
